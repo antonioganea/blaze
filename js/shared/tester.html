@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<title>Perlin noise</title>
+<style>
+.centerbox {
+  /* flexbox, por favor */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
+
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-pack: center;
+  -moz-box-align: center;
+
+  width: 100%;
+  height: 100%;
+  margin: 0; padding: 0;
+}
+body, html { width: 100%; height: 100%; padding: 0; margin: 0; }
+canvas {
+  /* border-radius: 30px;  might not work with putImageData */
+  box-shadow: 0 0 10px #777;
+  width: 1024px;
+  height: 768px;
+}
+body {
+  background-color: #eee;
+}
+</style>
+<div class='centerbox'><canvas></canvas></div>
+<script src='perlinnoise.js'></script>
+<script>
+var canvas = document.getElementsByTagName('canvas')[0];
+canvas.width = 1024;
+canvas.height = 768;
+
+var ctx = canvas.getContext('2d');
+
+var image = ctx.createImageData(canvas.width, canvas.height);
+var data = image.data;
+
+var start = Date.now();
+
+var max = 0;
+var min = 1;
+
+var scale = 2/(5*16);
+var octaves = 6;
+var persistance = 0.6;
+
+Perlin.setSeed(1004);
+
+for (var x = 0; x < canvas.width; x++) {
+  for (var y = 0; y < canvas.height; y++) {
+	var value = Math.abs(Perlin.OctavePerlin( x*2*scale / (5*16), y*2*scale / (5*16),6, 0.6));
+	if ( value > max ) { max = value }
+	if ( value < min ) { min = value }
+  }
+}
+
+function precision( t, p ){
+	return Math.floor(t/p)*p;
+}
+
+for (var x = 0; x < canvas.width; x++) {
+  //if (x % 100 == 0) {
+  //  noise.seed(Math.random());
+  //}
+  for (var y = 0; y < canvas.height; y++) {
+	let tX, tY;
+	tX = x*2*scale / (5*16);
+	tY = y*2*scale / (5*16);
+	tX = precision( tX, 0.005 );
+	tY = precision( tY, 0.005 );
+	var value = Perlin.OctavePerlin( tX, tY,6, 0.6);
+	
+	value = (value-min)*(1/(max-min)) // normalizing to 0.0 - 1.0
+
+    value *= 256;
+
+    var cell = (x + y * canvas.width) * 4;
+	
+	// Some color-grading
+	
+	if ( value < 65 ){
+		//data[cell] = data[cell + 1] = data[cell + 2] = value;
+		if ( value < 40 )
+			if ( value < 15 )
+				if ( value < 10 )
+					if ( value < 5 )
+						data[cell] = data[cell+1] = data[cell+2] = 164;
+					else
+						data[cell] = data[cell+1] = data[cell+2] = 127;
+				else
+					data[cell] = data[cell+1] = data[cell+2] = 100;
+			else
+				data[cell+1] = 127;
+		else{
+			data[cell+1] = 100;
+		}
+	}else {
+		if ( value > 100 )
+			data[cell+2] = 100;
+		else
+			data[cell+2] = 128;
+	}
+	
+	// uncomment this to get the perlin noise map
+	//data[cell] = data[cell+1] = data[cell+2] = value;
+
+    data[cell + 3] = 255; // alpha.
+  }
+}
+
+console.log(max)
+console.log(min)
+
+
+var end = Date.now();
+
+ctx.fillColor = 'black';
+ctx.fillRect(0, 0, 100, 100);
+ctx.putImageData(image, 0, 0);
+
+
+ctx.font = '16px sans-serif'
+ctx.textAlign = 'center';
+ctx.fillText('Rendered in ' + (end - start) + ' ms', canvas.width / 2, canvas.height - 20);
+
+if(console) {
+  console.log('Rendered in ' + (end - start) + ' ms');
+}
+</script>
