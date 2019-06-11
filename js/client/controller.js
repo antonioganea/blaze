@@ -52,6 +52,7 @@ function onDocumentMouseDown( event ) {
 			let tX = ( pos.x + 2125 ) / 50;
 			let tZ = ( pos.z + 2125 ) / 50;
 			
+			/*
 			if ( Math.random() > 0.5 ){
 				SceneManager.addTotem( tX, tZ, TotemTypes.forest, true );
 				socket.emit("placeTotem",tX,tZ, TotemTypes.forest);
@@ -62,7 +63,10 @@ function onDocumentMouseDown( event ) {
 			}else {
 				SceneManager.addTotem( tX, tZ, TotemTypes.residential, true );
 				socket.emit( "placeTotem", tX, tZ, TotemTypes.residential );
-			}
+			}*/
+			
+			SceneManager.addTotem( tX, tZ, TotemTypes.launchsite );
+			socket.emit( "placeTotem", tX, tZ, TotemTypes.launchsite );
 		}
 	}
 }

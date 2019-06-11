@@ -1,6 +1,6 @@
 var TotemLoader = {
 	
-	items : ["forest","forest_snow","rocks","rocks_snow","block"],
+	items : ["forest","forest_snow","rocks","rocks_snow","block","samsite"],
 	totems : {},
 	
 	loaded : false,
@@ -50,6 +50,9 @@ var TotemLoader = {
 				break;
 			case TotemTypes.residential:
 				totem = TotemLoader.totems.block.clone();
+				break;
+			case TotemTypes.launchsite:
+				totem = TotemLoader.totems.samsite.clone();
 				break;
 		}
 		
